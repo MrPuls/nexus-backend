@@ -11,6 +11,7 @@ func main() {
 	if dbErr != nil {
 		return
 	}
+	db.Connection = dbPool
 	defer fmt.Println("Closing database connection")
 	defer dbPool.Close()
 	err := server.StartServer()

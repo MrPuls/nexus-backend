@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+var Connection *pgxpool.Pool
+
 func InitDB() (*pgxpool.Pool, error) {
 	fmt.Println("Connecting to database...")
 	pool, err := pgxpool.New(context.Background(), os.Getenv("POSTGRES_URL"))
@@ -20,11 +22,10 @@ func InitDB() (*pgxpool.Pool, error) {
 
 	pingErr := pool.Ping(context.Background())
 	if pingErr != nil {
-		_, err := fmt.Fprintf(os.Stderr, "Unable ping the database: %v\n", err)
+		_, err := fmt.Fprintf(os.Stderr, "Unable to ping the database: %v\n", pingErr)
 		if err != nil {
 		}
 		os.Exit(1)
 	}
-
 	return pool, nil
 }

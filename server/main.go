@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -47,21 +46,4 @@ func StartServer() error {
 
 	log.Println("Server exiting")
 	return nil
-}
-
-func baseHandler(w http.ResponseWriter, r *http.Request) {
-	response := map[string]string{"message": "Hello World"}
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-		return
-	}
-}
-
-// Custom middleware example
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Request received: %s %s", r.Method, r.URL.Path)
-		next.ServeHTTP(w, r)
-	})
 }
