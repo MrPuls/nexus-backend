@@ -7,14 +7,24 @@ import (
 	"os"
 )
 
-func DbConnector() {
-	dbpool, err := pgxpool.New(context.Background(), os.Getenv("POSTGRES_URL"))
+func InitDB() (*pgxpool.Pool, error) {
+	fmt.Println("Connecting to database...")
+	pool, err := pgxpool.New(context.Background(), os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		_, err := fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
 		if err != nil {
-			return
 		}
 		os.Exit(1)
 	}
-	defer dbpool.Close()
+	fmt.Println("Connected to database!")
+
+	pingErr := pool.Ping(context.Background())
+	if pingErr != nil {
+		_, err := fmt.Fprintf(os.Stderr, "Unable ping the database: %v\n", err)
+		if err != nil {
+		}
+		os.Exit(1)
+	}
+
+	return pool, nil
 }

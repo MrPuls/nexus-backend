@@ -1,8 +1,18 @@
 package main
 
-import "nexus/server"
+import (
+	"fmt"
+	"nexus/internal/db"
+	"nexus/server"
+)
 
 func main() {
+	dbPool, dbErr := db.InitDB()
+	if dbErr != nil {
+		return
+	}
+	defer fmt.Println("Closing database connection")
+	defer dbPool.Close()
 	err := server.StartServer()
 	if err != nil {
 		return
