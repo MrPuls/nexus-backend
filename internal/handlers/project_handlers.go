@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"nexus/internal/models"
 	"nexus/internal/store"
-	"strconv"
 )
 
 func CreateProject(w http.ResponseWriter, r *http.Request) {
@@ -26,9 +25,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	projIdInt, _ := strconv.ParseInt(project.ID, 0, 0)
-
-	rawResponse := map[string]int64{"id": projIdInt}
+	rawResponse := map[string]int64{"id": project.ID}
 
 	response, mshErr := json.Marshal(rawResponse)
 	if mshErr != nil {
@@ -45,7 +42,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllProjects(w http.ResponseWriter, r *http.Request) {
-	projects, err := store.GetAllProjects(w, r.Context())
+	projects, err := store.GetAllProjects(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -58,17 +55,49 @@ func GetAllProjects(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte(`{"message": "Project information queried"}`))
+	r.Body = http.MaxBytesReader(w, r.Body, 1048576) // 1MB limit
+
+	var project models.Project
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	err := decoder.Decode(&project.ID)
 	if err != nil {
+		http.Error(w, "Bad request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-
-}
-
-func UpdateProject(w http.ResponseWriter, r *http.Request) {
+	respProj, getErr := store.GetProject(r.Context(), project.ID)
+	if getErr != nil {
+		http.Error(w, getErr.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	jsonErr := json.NewEncoder(w).Encode(respProj)
+	if jsonErr != nil {
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 
 }
 
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, 1048576) // 1MB limit
+
+	var project models.Project
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	err := decoder.Decode(&project.ID)
+	if err != nil {
+		http.Error(w, "Bad request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	delErr := store.DeleteProject(r.Context(), project.ID)
+	if delErr != nil {
+		http.Error(w, delErr.Error(), http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 }
