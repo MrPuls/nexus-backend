@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"nexus/internal/db"
-	"nexus/server"
+	"nexus/cmd/server"
+	"nexus/pkg/db"
 )
 
 func main() {
