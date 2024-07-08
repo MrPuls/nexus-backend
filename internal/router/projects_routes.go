@@ -10,5 +10,7 @@ func SetupProjectRoutes(r chi.Router) {
 		r.Post("/", handlers.CreateProject)
 		r.Get("/", handlers.GetAllProjects)
 		r.Get("/{id}", handlers.GetProject)
+		r.Delete("/{id}", handlers.DeleteProject)
+		r.Put("/{id}", handlers.UpdateProject)
 	})
 }
