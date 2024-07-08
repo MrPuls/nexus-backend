@@ -19,6 +19,7 @@ func InitDB() (*pgxpool.Pool, error) {
 		os.Exit(1)
 	}
 	fmt.Println("Connected to database!")
+	fmt.Println("Checking database health...")
 
 	pingErr := pool.Ping(context.Background())
 	if pingErr != nil {
@@ -27,5 +28,6 @@ func InitDB() (*pgxpool.Pool, error) {
 		}
 		os.Exit(1)
 	}
+	fmt.Println("Database healthy!")
 	return pool, nil
 }
