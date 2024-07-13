@@ -22,8 +22,8 @@ func CreateProject(c context.Context, project *models.Project) error {
 func GetProject(c context.Context, id int64) (*models.Project, error) {
 	var project models.Project
 	err := db.Connection.QueryRow(c,
-		"SELECT id, name FROM projects WHERE id = $1",
-		id).Scan(&project.ID, &project.Name)
+		"SELECT id, name, description FROM projects WHERE id = $1",
+		id).Scan(&project.ID, &project.Name, &project.Description)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get project: %w", err)
 	}
